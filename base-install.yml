@@ -3,6 +3,7 @@
   hosts: all
   become: true
   gather_facts: true
+  remote_user: vagrant
 
 #  environment:
 #    RSYNC_PROXY: http://proxy.fozzy.lan:3128
@@ -13,4 +14,4 @@
 
   roles:
     - { role: base, tags: [ "base" ] }
- #   - { role: haproxy, tags: [ "haproxy" ] }
+    - { role: haproxy, tags: [ "haproxy" ] }

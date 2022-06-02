@@ -3,8 +3,8 @@
   ansible.posix.selinux:
     state: disabled
 
-- name: Disable ipv6
-  shell: sed -i 's@\(GRUB_CMDLINE_LINUX=".*\)"@\1 ipv6.disable=1"@g' /etc/defaul/grub
+# - name: Disable ipv6
+#   shell: sed -i 's@\(GRUB_CMDLINE_LINUX=".*\)"@\1 ipv6.disable=1"@g' /etc/default/grub
 
 - name: Set timezone to Asia/Tokyo
   community.general.timezone:
@@ -13,10 +13,12 @@
 - name: Enable ntp sync
   shell: timedatectl set-ntp true
 
-- name: Install the epel
-  yum:
-    name: yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    state: present
+# - name: Enable mirrors
+#   shell: sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+# - name: Enable mirrors
+#   shell: sudo sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* 
+
 
 - name: YUM install
   yum:
