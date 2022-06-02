@@ -1,0 +1,16 @@
+---
+- name: Setup
+  hosts: all
+  become: true
+  gather_facts: true
+
+#  environment:
+#    RSYNC_PROXY: http://proxy.fozzy.lan:3128
+#    HTTPS_PROXY: http://proxy.fozzy.lan:3128
+#    HTTP_PROXY: http://proxy.fozzy.lan:3128
+#    FTP_PROXY: http://proxy.fozzy.lan:3128
+#    NO_PROXY: localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.fozzy.lan,.bank.lan,.justin.lan,.fz.lan
+
+  roles:
+    - { role: base, tags: [ "base" ] }
+ #   - { role: haproxy, tags: [ "haproxy" ] }
