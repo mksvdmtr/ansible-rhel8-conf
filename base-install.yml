@@ -14,4 +14,4 @@
 
   roles:
     - { role: base, tags: [ "base" ] }
-    - { role: haproxy, tags: [ "haproxy" ] }
+    - { role: haproxy-install, tags: [ "haproxy" ] }

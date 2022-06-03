@@ -1,0 +1,86 @@
+---
+- name: YUM install build tools
+  yum:
+    name:
+      - gcc
+      - pcre-devel
+      - tar
+      - make
+      - openssl-devel
+      - readline-devel
+      - systemd-devel
+
+- name: Downloading lua
+  get_url: 
+    url: https://www.lua.org/ftp/lua-{{ lua_version }}.tar.gz
+    dest: /tmp/
+
+- name: Extracting lua
+  ansible.builtin.unarchive:
+    src: /tmp/lua-5.3.5.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Installing lua
+  shell: make linux install
+  args:
+    chdir: /tmp/lua-{{ lua_version }}
+
+- name: Add haproxy user
+  ansible.builtin.user:
+    name: haproxy
+    shell: /bin/nologin
+    create_home: yes
+    home: /var/lib/haproxy
+
+- name: Downloading haproxy
+  get_url:
+    url: http://www.haproxy.org/download/2.4/src/haproxy-{{ haproxy_version }}.tar.gz
+    dest: /tmp
+
+- name: Extracting haproxy
+  ansible.builtin.unarchive:
+    src: /tmp/haproxy-{{ haproxy_version }}.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Configuring haproxy
+  shell: make -j $(nproc) TARGET=linux-glibc USE_LINUX_TPROXY=1 USE_CRYPT_H=1 USE_GETADDRINFO=1 USE_ZLIB=1 USE_REGPARM=1 USE_OPENSSL=1 USE_LUA=1 LUA_LIB=/usr/local/lib LUA_INC=/usr/local/include USE_SYSTEMD=1 USE_PCRE=1 USE_PROMEX=1
+  args:
+    chdir: /tmp/haproxy-{{ haproxy_version }}
+
+- name: Installing HAproxy
+  shell: make install-bin
+  args:
+    chdir: /tmp/haproxy-{{ haproxy_version }}
+
+- name: Generate Haproxy systemd
+  shell: make
+  args:
+    chdir: /tmp/haproxy-{{ haproxy_version }}/admin/systemd
+
+- name: Installing systemd HAproxy
+  ansible.builtin.copy:
+    src: /tmp/haproxy-{{ haproxy_version }}/admin/systemd/haproxy.service
+    dest: /etc/systemd/system/
+    owner: root
+    mode: '0644'
+    remote_src: yes
+
+- name: Systemd reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/haproxy/tls
+    state: directory
+    mode: '0755'
+    recurse: yes 
+
+- name: Upload haproxy default config
+  ansible.builtin.copy:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+
+    
